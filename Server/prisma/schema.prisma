@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int       @id @default(autoincrement())
+  googleId         String?   @unique
+  email            String    @unique
+  name             String
+  stellarPublicKey String?   @map("public_key")
+  stellarSecretEncrypted String? @map("secret_key_encrypted")
+  trustScore       Float     @default(50.0)
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt
+
+  transactions     Transaction[]
+  loans            Loan[]
+  disputes         Dispute[]
+
+  @@map("users")
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  amount      Float
+  type        String   // contribution, loan_disbursement, loan_repayment, penalty
+  status      String   @default("pending") // pending, completed, failed
+  stellarTxHash String? @map("stellar_tx_hash")
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@map("transactions")
+}
+
+model Loan {
+  id               Int       @id @default(autoincrement())
+  userId           Int       @map("user_id")
+  amount           Float
+  interestRate     Float     @default(0.0) @map("interest_rate")
+  repaymentDeadline DateTime  @map("repayment_deadline")
+  status           String    @default("pending") // pending, approved, rejected, active, repaid, defaulted
+  riskScore        Float?    @map("risk_score")
+  riskLevel        String?   @map("risk_level") // LOW, MEDIUM, HIGH
+  guarantorIds     Int[]     @map("guarantor_ids")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt
+
+  user             User      @relation(fields: [userId], references: [id])
+
+  @@map("loans")
+}
+
+model Dispute {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  title       String
+  description String
+  evidenceUrl String?   @map("evidence_url")
+  status      String    @default("open") // open, under_review, resolved, rejected
+  resolution  String?
+  resolvedBy  Int?      @map("resolved_by")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt
+
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@map("disputes")
+}
