@@ -1,31 +1,34 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Contribute from './pages/Contribute';
 import Loan from './pages/Loan';
 import Disputes from './pages/Disputes';
+import Landing from './pages/Landing';
 import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-gray-50">
-          <Navbar />
-          <main className="container mx-auto px-4 py-8">
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-              <Route path="/contribute" element={<PrivateRoute><Contribute /></PrivateRoute>} />
-              <Route path="/loan" element={<PrivateRoute><Loan /></PrivateRoute>} />
-              <Route path="/disputes" element={<PrivateRoute><Disputes /></PrivateRoute>} />
-            </Routes>
-          </main>
-        </div>
-      </Router>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+            <Route path="/contribute" element={<PrivateRoute><Contribute /></PrivateRoute>} />
+            <Route path="/loan" element={<PrivateRoute><Loan /></PrivateRoute>} />
+            <Route path="/disputes" element={<PrivateRoute><Disputes /></PrivateRoute>} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const passport = require('passport');
+const { generalLimiter } = require('./middleware/rateLimiter');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
@@ -12,6 +13,7 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 
 // Middleware
+app.use(generalLimiter);
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

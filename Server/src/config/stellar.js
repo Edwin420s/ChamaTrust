@@ -1,8 +1,35 @@
 const StellarSdk = require('stellar-sdk');
 
-const server = new StellarSdk.Server(process.env.STELLAR_HORIZON_URL);
+// Validate environment variables
+if (!process.env.STELLAR_HORIZON_URL) {
+  throw new Error('STELLAR_HORIZON_URL is required');
+}
+
+if (!process.env.STELLAR_NETWORK) {
+  throw new Error('STELLAR_NETWORK is required');
+}
+
+const server = new StellarSdk.Horizon.Server(process.env.STELLAR_HORIZON_URL, {
+  allowHttp: process.env.STELLAR_NETWORK === 'testnet'
+});
+
 const network = process.env.STELLAR_NETWORK === 'testnet' 
   ? StellarSdk.Networks.TESTNET 
   : StellarSdk.Networks.PUBLIC;
 
-module.exports = { server, network };
+// Test connection
+const testConnection = async () => {
+  try {
+    await server.root();
+    console.log('✅ Stellar Horizon server connected');
+  } catch (error) {
+    console.error('❌ Failed to connect to Stellar Horizon:', error.message);
+    throw error;
+  }
+};
+
+if (process.env.NODE_ENV !== 'test') {
+  testConnection();
+}
+
+module.exports = { server, network, testConnection };

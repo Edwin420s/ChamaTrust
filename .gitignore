@@ -1,11 +1,6 @@
-# ===============================
-#  ChamaTrust .gitignore
-#  Full-stack + Blockchain
-# ===============================
+# ChamaTrust .gitignore
 
-# -------------------------------
-#  Node.js / JavaScript
-# -------------------------------
+# Dependencies
 node_modules/
 npm-debug.log*
 yarn-debug.log*
@@ -13,204 +8,115 @@ yarn-error.log*
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
-.env.local
-.env.*.local
 
-# -------------------------------
-#  Environment & Secrets
-# -------------------------------
+# Environment variables
 .env
-.env.production
-.env.development
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build outputs
+dist/
+build/
+out/
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
 .env.test
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Blockchain/Stellar
+*.stellar
+stellar_keys.txt
+*.stellar_keypair
+blockchain/soroban-contracts/target/
+blockchain/soroban-contracts/**/target/
+*.wasm
+
+# Secrets
 *.pem
 *.key
 *.crt
 *.secret
 secrets/
 credentials.json
-
-# -------------------------------
-#  Backend (Node.js / Express)
-# -------------------------------
-Server/node_modules/
-Server/dist/
-Server/build/
-Server/.env
-Server/logs/
-Server/uploads/
-Server/temp/
-Server/*.log
-
-# -------------------------------
-#  Frontend (React / Vite)
-# -------------------------------
-Client/node_modules/
-Client/dist/
-Client/build/
-Client/.env
-Client/.env.local
-Client/.vite/
-Client/*.log
-
-# -------------------------------
-#  Blockchain / Stellar / Soroban
-# -------------------------------
-blockchain/stellar/.stellar/
-blockchain/soroban-contracts/target/
-blockchain/soroban-contracts/**/target/
-blockchain/soroban-contracts/Cargo.lock
-blockchain/*.wasm
-blockchain/*.json
-stellar_keys.txt
-*.stellar_keypair
-
-# -------------------------------
-#  Database & Migrations
-# -------------------------------
-*.db
-*.sqlite
-*.sqlite3
-*.dump
-*.pgdump
-pgdata/
-migrations/*.sql~  # backup SQL files
-scripts/*.secret.sql
-
-# -------------------------------
-#  Docker & Containers
-# -------------------------------
-docker/
-*.dockerignore
-*.tar
-*.tar.gz
-*.img
-.docker/
-docker-compose.override.yml
-
-# -------------------------------
-#  IDE / Editor Files
-# -------------------------------
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-*.suo
-*.user
-*.sln
-*.csproj
-*.vscode/
-*.code-workspace
-
-# -------------------------------
-#  OS / System Files
-# -------------------------------
-Thumbs.db
-desktop.ini
-ehthumbs.db
-*.ds_store
-*.Spotlight-V100
-*.Trashes
-*.AppleDouble
-*.LSOverride
-
-# -------------------------------
-#  Logs & Temp Files
-# -------------------------------
-logs/
-*.log
-temp/
-tmp/
-*.tmp
-*.temp
-*.cache
-*.pid
-*.seed
-*.pid.lock
-
-# -------------------------------
-#  Build Artifacts
-# -------------------------------
-dist/
-build/
-out/
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-*.jar
-*.war
-*.ear
-
-# -------------------------------
-#  Testing & Coverage
-# -------------------------------
-coverage/
-.nyc_output/
-*.test.js~
-*.test.ts~
-*.spec.js~
-*.spec.ts~
-jest.config.js
-vitest.config.js
-*.test-results/
-
-# -------------------------------
-#  Documentation (generated)
-# -------------------------------
-docs/_build/
-docs/api/*.html
-docs/*.pdf
-docs/*.epub
-
-# -------------------------------
-#  Stellar-specific ignores
-# -------------------------------
-*.stellar
-stellar-sdk.log
-horizon.log
-soroban-rpc.log
-friendbot_output.txt
-
-# -------------------------------
-#  Project-specific secrets
-# -------------------------------
-*.p12
-*.pfx
-*.jks
-*.keystore
-*.truststore
-.htpasswd
-.htaccess
-.ssh/
-.aws/
-.gcloud/
-.azure/
-
-# -------------------------------
-#  Misc
-# -------------------------------
-*.bak
-*.old
-*.orig
-*.rej
-*.sql~
-.DS_Store
-.cache/
-.tern-port
-# Node.js / JavaScript
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-package-lock.json
-yarn.lock
-.pnpm-debug.log*
-
-# Environment variables
 .env
 .env.local
 .env.*.local

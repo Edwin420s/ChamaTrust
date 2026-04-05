@@ -1,5 +1,5 @@
 const StellarSdk = require('stellar-sdk');
-const crypto = require('crypto');
+const { encrypt, decrypt } = require('./encryptionService');
 
 const createWallet = () => {
   const pair = StellarSdk.Keypair.random();
@@ -10,23 +10,31 @@ const createWallet = () => {
 };
 
 const encryptSecret = (secret) => {
-  const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(process.env.ENCRYPTION_KEY, 'hex'), iv);
-  let encrypted = cipher.update(secret, 'utf8', 'hex');
-  encrypted += cipher.final('hex');
-  const authTag = cipher.getAuthTag();
-  return `${iv.toString('hex')}:${encrypted}:${authTag.toString('hex')}`;
+  return encrypt(secret);
 };
 
 const decryptSecret = (encryptedData) => {
-  const [ivHex, encryptedSecret, authTagHex] = encryptedData.split(':');
-  const iv = Buffer.from(ivHex, 'hex');
-  const authTag = Buffer.from(authTagHex, 'hex');
-  const decipher = crypto.createDecipheriv('aes-256-gcm', Buffer.from(process.env.ENCRYPTION_KEY, 'hex'), iv);
-  decipher.setAuthTag(authTag);
-  let decrypted = decipher.update(encryptedSecret, 'hex', 'utf8');
-  decrypted += decipher.final('utf8');
-  return decrypted;
+  return decrypt(encryptedData);
 };
 
-module.exports = { createWallet, encryptSecret, decryptSecret };
+/**
+ * Validates a Stellar keypair
+ * @param {string} publicKey - Stellar public key
+ * @param {string} secret - Stellar secret key
+ * @returns {boolean} - True if valid
+ */
+const validateKeypair = (publicKey, secret) => {
+  try {
+    const keypair = StellarSdk.Keypair.fromSecret(secret);
+    return keypair.publicKey() === publicKey;
+  } catch (error) {
+    return false;
+  }
+};
+
+module.exports = { 
+  createWallet, 
+  encryptSecret, 
+  decryptSecret,
+  validateKeypair
+};
