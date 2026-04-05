@@ -1,4 +1,4 @@
-# 🏦 ChamaTrust
+# ChamaTrust
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen)](https://nodejs.org/)
@@ -8,7 +8,7 @@
 
 A comprehensive trust and reputation management system for digital chamas (African savings groups) that combines behavioral scoring with blockchain technology to create transparent, accountable financial communities.
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Overview](#-overview)
 - [Features](#-features)
@@ -28,7 +28,7 @@ A comprehensive trust and reputation management system for digital chamas (Afric
 - [License](#-license)
 - [Support](#-support)
 
-## 🌟 Overview
+## Overview
 
 ChamaTrust addresses the fundamental challenge of trust in group financial systems by implementing:
 
@@ -40,15 +40,15 @@ ChamaTrust addresses the fundamental challenge of trust in group financial syste
 
 The system provides a **hybrid Web2/Web3 experience** where users enjoy familiar authentication while benefiting from blockchain transparency and security.
 
-## 🚀 Features
+## Features
 
-### 🔐 Identity & Authentication
+### Identity and Authentication
 - **Google OAuth Integration**: Seamless social login
 - **Automatic Wallet Creation**: Stellar wallets generated on signup
 - **Session Management**: Secure JWT-based authentication
 - **Role-Based Access**: User, Admin, and Super Admin roles
 
-### � Trust & Reputation Engine
+### Trust and Reputation Engine
 - **Dynamic Scoring**: 0-100 trust score based on:
   - Payment consistency (40% weight)
   - Contribution reliability (30% weight)  
@@ -58,14 +58,14 @@ The system provides a **hybrid Web2/Web3 experience** where users enjoy familiar
 - **Behavioral Insights**: Patterns and trends analysis
 - **Cross-Group Portability**: Reputation follows user across chamas
 
-### 💰 Financial Management
+### Financial Management
 - **Contribution Tracking**: Real-time payment monitoring
 - **Loan Management**: Application, approval, and repayment tracking
 - **Automated Penalties**: Rule-based fine calculations
 - **Financial Reports**: Comprehensive transaction history
 - **Multi-Currency Support**: Kenyan Shillings and other currencies
 
-### ⚖️ Dispute Resolution
+### Dispute Resolution
 - **Structured Dispute Process**: Evidence-based conflict management
 - **Multi-Party Resolution**: Admin and member voting systems
 - **Permanent Audit Trail**: Immutable dispute records
@@ -77,69 +77,43 @@ The system provides a **hybrid Web2/Web3 experience** where users enjoy familiar
 - **Recommendation Engine**: Automated decision suggestions
 - **Historical Analysis**: Past performance consideration
 
-## 🏗️ Architecture
+## System Architecture
 
-```mermaid
-graph TB
-    subgraph User
-        A[Browser / Mobile App]
-    end
+The ChamaTrust system follows a hybrid Web2/Web3 architecture with clear separation of concerns:
 
-    subgraph Frontend
-        B[React Application]
-        C[Authentication Components]
-        D[Dashboard Interface]
-        E[Financial Forms]
-        F[Analytics Views]
-    end
+### Core Components
 
-    subgraph Backend
-        G[Express.js API Gateway]
-        H[Authentication Service]
-        I[Trust Engine]
-        J[Financial Service]
-        K[Dispute Service]
-        L[Wallet Manager]
-    end
+**Frontend Application (React)**
+- User interface components for authentication, dashboard, and financial operations
+- State management using React Context and custom hooks
+- API integration layer for backend communication
+- Responsive design using Tailwind CSS
 
-    subgraph Data
-        M[(PostgreSQL Database)]
-        N[(User Data)]
-        O[(Transaction Records)]
-        P[(Trust Scores)]
-        Q[(Dispute Data)]
-    end
+**Backend API (Node.js)**
+- Express.js server with comprehensive middleware stack
+- Service layer for business logic separation
+- PostgreSQL database with Prisma ORM
+- JWT-based authentication and session management
 
-    subgraph Blockchain
-        R[Stellar Network]
-        S[Soroban Smart Contracts]
-        T[Horizon API]
-    end
+**Blockchain Layer (Stellar)**
+- Stellar network integration for immutable transaction records
+- Soroban smart contracts for advanced automation
+- Horizon API for network interaction
 
-    subgraph External
-        U[Google OAuth]
-        V[M-Pesa Integration]
-    end
+**Data Flow**
+1. User authenticates via Google OAuth
+2. Backend creates Stellar wallet automatically
+3. Trust score calculated based on behavioral patterns
+4. Financial transactions recorded on blockchain
+5. Risk assessment informs loan decisions
 
-    A --> B
-    B --> C & D & E & F
-    C --> H
-    D --> I & J
-    E --> K
-    F --> L
-    H --> G
-    I --> G
-    J --> G
-    K --> G
-    L --> G
-    G --> M
-    M --> N & O & P & Q
-    L --> T
-    T --> R
-    S --> R
-    H --> U
-    J --> V
-```
+### Integration Points
+
+- **Authentication**: Google OAuth → JWT → Session Management
+- **Wallet Management**: Stellar SDK → Key Generation → Encryption
+- **Trust Engine**: Behavioral Analysis → Score Calculation → Database Storage
+- **Financial Operations**: API Requests → Business Logic → Blockchain Transactions
+- **Dispute Resolution**: Evidence Collection → Admin Review → Resolution Logging
 
 ### 💰 Financial Management
 - **Stellar Blockchain Integration** - Immutable transaction records
