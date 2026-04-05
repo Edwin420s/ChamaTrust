@@ -33,25 +33,25 @@ credentials.json
 # -------------------------------
 #  Backend (Node.js / Express)
 # -------------------------------
-backend/node_modules/
-backend/dist/
-backend/build/
-backend/.env
-backend/logs/
-backend/uploads/
-backend/temp/
-backend/*.log
+Server/node_modules/
+Server/dist/
+Server/build/
+Server/.env
+Server/logs/
+Server/uploads/
+Server/temp/
+Server/*.log
 
 # -------------------------------
 #  Frontend (React / Vite)
 # -------------------------------
-frontend/node_modules/
-frontend/dist/
-frontend/build/
-frontend/.env
-frontend/.env.local
-frontend/.vite/
-frontend/*.log
+Client/node_modules/
+Client/dist/
+Client/build/
+Client/.env
+Client/.env.local
+Client/.vite/
+Client/*.log
 
 # -------------------------------
 #  Blockchain / Stellar / Soroban
