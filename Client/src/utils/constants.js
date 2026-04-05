@@ -2,7 +2,9 @@
 export const API_ENDPOINTS = {
   AUTH: {
     GOOGLE_LOGIN: '/auth/google/mock',
-    PROFILE: '/user/profile'
+    EMAIL_LOGIN: '/auth/login',
+    REGISTER: '/auth/register',
+    PROFILE: '/users/profile'
   },
   TRANSACTIONS: {
     CONTRIBUTE: '/transactions/contribute',
@@ -10,14 +12,15 @@ export const API_ENDPOINTS = {
   },
   LOANS: {
     APPLY: '/loans/apply',
-    STATUS: '/loans/status'
+    STATUS: '/loans',
+    RISK: '/loans/risk'
   },
   DISPUTES: {
     CREATE: '/disputes',
     LIST: '/disputes'
   },
   TRUST: {
-    SCORE: '/trust-score'
+    SCORE: '/users/trust-score'
   }
 };
 

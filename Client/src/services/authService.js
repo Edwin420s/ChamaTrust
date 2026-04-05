@@ -2,7 +2,7 @@ import api from './api';
 
 export const authService = {
   googleLogin: async (email, name) => {
-    const response = await api.post('/auth/google', { email, name });
+    const response = await api.post('/auth/google/mock', { email, name });
     return response.data;
   },
 
@@ -16,10 +16,8 @@ export const authService = {
     return response.data;
   },
 
-  getProfile: async (token) => {
-    const response = await api.get('/users/profile', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+  getProfile: async () => {
+    const response = await api.get('/users/profile');
     return response.data;
   }
 };

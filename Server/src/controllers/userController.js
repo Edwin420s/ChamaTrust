@@ -14,4 +14,20 @@ const getTrustScoreController = async (req, res) => {
   res.json({ trustScore: score });
 };
 
-module.exports = { getProfile, getTrustScoreController };
+const updateProfile = async (req, res) => {
+  try {
+    const { name } = req.body;
+    
+    const user = await prisma.user.update({
+      where: { id: req.user.id },
+      data: { name },
+      select: { id: true, email: true, name: true, trustScore: true, stellarPublicKey: true, createdAt: true }
+    });
+    
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: 'Profile update failed' });
+  }
+};
+
+module.exports = { getProfile, getTrustScoreController, updateProfile };

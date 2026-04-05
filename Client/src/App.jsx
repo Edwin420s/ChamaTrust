@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Contribute from './pages/Contribute';
 import Loan from './pages/Loan';
 import Disputes from './pages/Disputes';
+import Profile from './pages/Profile';
 import Landing from './pages/Landing';
 import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
@@ -24,6 +25,7 @@ function App() {
             <Route path="/contribute" element={<PrivateRoute><Contribute /></PrivateRoute>} />
             <Route path="/loan" element={<PrivateRoute><Loan /></PrivateRoute>} />
             <Route path="/disputes" element={<PrivateRoute><Disputes /></PrivateRoute>} />
+            <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>
