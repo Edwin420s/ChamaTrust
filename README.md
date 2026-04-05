@@ -381,101 +381,24 @@ Risk levels calculated based on:
 
 ## 🚀 Deployment
 
-### Production Deployment
+### Production Environment Setup
 
-1. **Database Setup**
+#### Database Configuration
 ```bash
-# Create production database
+# Production database
 createdb chamatrust_prod
 
 # Run migrations
 npx prisma migrate deploy
+
+# Seed production data (optional)
+node scripts/seed-prod.js
 ```
 
-2. **Environment Configuration**
+#### Environment Configuration
 ```bash
-# Set production variables
+# Production environment variables
 NODE_ENV=production
-STELLAR_NETWORK=public
-```
-
-3. **Build Frontend**
-```bash
-cd Client
-npm run build
-```
-
-4. **Start Services**
-```bash
-# Backend
-cd Server
-npm start
-
-# Frontend (serve static files)
-# Use nginx, apache, or similar
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🏆 Hackathon Submission
-
-This project was built for the **ChamaConnect Virtual Hackathon** with the following innovations:
-
-### Problem Solved
-- **Trust Breakdown** in digital chamas
-- **Lack of Cross-Chama Reputation** systems
-- **Manual Risk Assessment** in lending
-- **Poor Dispute Resolution** mechanisms
-
-### Solution Impact
-- **Reduces defaults** by 40% through predictive risk scoring
-- **Increases transparency** with immutable blockchain records
-- **Improves member accountability** across multiple chamas
-- **Streamlines dispute resolution** with structured workflows
-
-### Technical Innovation
-- **Hybrid Web2/Web3 Architecture** - User-friendly blockchain integration
-- **Behavioral Analytics** - Machine learning-ready trust scoring
-- **Cross-Platform Identity** - Portable reputation system
-- **Real-time Risk Assessment** - Instant loan decisions
-
-### Competitive Advantage
-Unlike typical hackathon projects that focus on:
-- ❌ Fancy dashboards
-- ❌ AI hype
-- ❌ UI improvements
-
-ChamaTrust solves:
-- ✅ **Real behavioral trust issues**
-- ✅ **Cross-group accountability**
-- ✅ **Data-driven risk assessment**
-- ✅ **Immutable dispute resolution**
-
-## 📞 Support
-
-For questions and support:
-- Email: support@chamatrust.com
-- GitHub Issues: [Create an issue](https://github.com/your-repo/issues)
-- Documentation: [Full docs](https://docs.chamatrust.com)
-
----
-
-**Built with ❤️ for the ChamaConnect Hackathon** | **MUIAA Ltd x Salamander Community**
-- **Dynamic Trust Scoring** (0-100) based on:
-  - Payment consistency (40%)
-  - Contribution reliability (30%)
-  - Participation level (20%)
-  - Penalty history (10%)
 - **Behavioral Analytics** - Track patterns over time
 - **Risk Assessment** - Predict loan default probability
 
