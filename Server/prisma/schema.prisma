@@ -9,18 +9,19 @@ datasource db {
 
 model User {
   id               Int       @id @default(autoincrement())
-  googleId         String?   @unique
   email            String    @unique
-  name             String
   password         String?
-  stellarPublicKey String?   @map("public_key")
-  stellarSecretEncrypted String? @map("secret_key_encrypted")
+  name             String
   trustScore       Float     @default(0.0)
+  stellarPublicKey String?   @map("stellar_public_key")
+  stellarSecretKey String?   @map("stellar_secret_key")
+  role             String    @default("user") // user, admin
+  isActive         Boolean   @default(true)
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt
 
-  transactions     Transaction[]
   loans            Loan[]
+  transactions     Transaction[]
   disputes         Dispute[]
 
   @@map("users")

@@ -4,7 +4,7 @@ const { getTrustScore } = require('../services/trustService');
 const getProfile = async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: req.user.id },
-    select: { id: true, email: true, name: true, trustScore: true, stellarPublicKey: true, createdAt: true }
+    select: { id: true, email: true, name: true, trustScore: true, stellarPublicKey: true, role: true, isActive: true, createdAt: true }
   });
   res.json(user);
 };
@@ -21,7 +21,7 @@ const updateProfile = async (req, res) => {
     const user = await prisma.user.update({
       where: { id: req.user.id },
       data: { name },
-      select: { id: true, email: true, name: true, trustScore: true, stellarPublicKey: true, createdAt: true }
+      select: { id: true, email: true, name: true, trustScore: true, stellarPublicKey: true, role: true, isActive: true, createdAt: true }
     });
     
     res.json(user);

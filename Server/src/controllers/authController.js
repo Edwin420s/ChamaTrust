@@ -44,7 +44,7 @@ const mockGoogleLogin = async (req, res) => {
     expiresIn: process.env.JWT_EXPIRES_IN
   });
   
-  res.json({ token, user: { id: user.id, email: user.email, name: user.name, trustScore: user.trustScore } });
+  res.json({ token, user: { id: user.id, email: user.email, name: user.name, trustScore: user.trustScore, role: user.role, isActive: user.isActive } });
 };
 
 const emailLogin = async (req, res) => {
@@ -68,7 +68,7 @@ const emailLogin = async (req, res) => {
       expiresIn: process.env.JWT_EXPIRES_IN
     });
     
-    res.json({ token, user: { id: user.id, email: user.email, name: user.name, trustScore: user.trustScore } });
+    res.json({ token, user: { id: user.id, email: user.email, name: user.name, trustScore: user.trustScore, role: user.role, isActive: user.isActive } });
   } catch (error) {
     res.status(500).json({ error: 'Login failed' });
   }
@@ -120,7 +120,7 @@ const register = async (req, res) => {
     });
     
     console.log('Registration successful');
-    res.json({ token, user: { id: user.id, email: user.email, name: user.name, trustScore: user.trustScore } });
+    res.json({ token, user: { id: user.id, email: user.email, name: user.name, trustScore: user.trustScore, role: user.role, isActive: user.isActive } });
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ error: 'Registration failed', details: error.message });
