@@ -56,14 +56,19 @@ const Contribute = () => {
     setError(null);
 
     try {
-      // For demo purposes, simulate successful transaction
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await transactionService.contribute(
+        Number(amount),
+        senderSecret,
+        receiverPublic
+      );
       
-      const mockTransactionHash = 'TX' + Math.random().toString(36).substr(2, 9).toUpperCase();
-      setMessage(`Contribution successful! Transaction: ${mockTransactionHash}`);
+      setMessage(`Contribution successful! Transaction: ${response.txHash}`);
       setAmount('');
       setSenderSecret('');
       setReceiverPublic('');
+      
+      // Refresh transaction data
+      window.location.reload();
     } catch (err) {
       setError(err.response?.data?.error || 'Transaction failed. Please try again.');
     } finally {

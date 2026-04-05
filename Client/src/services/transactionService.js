@@ -13,8 +13,8 @@ export const transactionService = {
     const response = await api.get('/transactions');
     return response.data;
   },
-  applyLoan: async (amount) => {
-    const response = await api.post('/loans/apply', { amount });
+  applyLoan: async (loanData) => {
+    const response = await api.post('/loans/apply', loanData);
     return response.data;
   },
   getLoans: async () => {

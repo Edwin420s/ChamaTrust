@@ -48,7 +48,33 @@ const calculateTrustScore = async (userId) => {
 
 const getTrustScore = async (userId) => {
   const user = await prisma.user.findUnique({ where: { id: userId } });
-  return user?.trustScore || 0;
+  const baseScore = user?.trustScore || 0;
+  
+  // Calculate score factors for display
+  const transactions = await prisma.transaction.findMany({
+    where: { userId, status: 'completed' }
+  });
+  
+  const loans = await prisma.loan.findMany({
+    where: { userId }
+  });
+  
+  const contributions = transactions.filter(tx => tx.type === 'contribution').length;
+  const repayments = transactions.filter(tx => tx.type === 'loan_repayment').length;
+  const activeLoans = loans.filter(loan => loan.status === 'active' || loan.status === 'approved').length;
+  const defaultedLoans = loans.filter(loan => loan.status === 'defaulted').length;
+  
+  const scoreFactors = [
+    { name: 'Contributions', points: Math.min(30, contributions * 3) },
+    { name: 'Payment History', points: Math.min(40, repayments * 4) },
+    { name: 'Active Loans', points: activeLoans > 0 ? 10 : 0 },
+    { name: 'Penalties', points: -(defaultedLoans * 10) }
+  ];
+  
+  return {
+    trustScore: baseScore,
+    scoreFactors
+  };
 };
 
 module.exports = { calculateTrustScore, getTrustScore };

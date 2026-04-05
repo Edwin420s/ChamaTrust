@@ -16,7 +16,7 @@ const Loan = () => {
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [loans, setLoans] = useState([]);
-  const [trustScore, setTrustScore] = useState(85);
+  const [trustScore, setTrustScore] = useState(0);
   const [riskAssessment, setRiskAssessment] = useState(null);
   const [showRiskDetails, setShowRiskDetails] = useState(false);
   const [activeTab, setActiveTab] = useState(location.search.includes('tab=repayment') ? 'repayment' : 'application');
@@ -54,44 +54,43 @@ const Loan = () => {
     { id: '3', label: '3 months', multiplier: 1.05 },
     { id: '6', label: '6 months', multiplier: 1.10 },
     { id: '12', label: '12 months', multiplier: 1.20 },
-    { id: '24', label: '24 months', multiplier: 1.35 }
-  ];
-
-  const mockLoans = [
-    {
-      id: 1,
-      amount: 25000,
-      purpose: 'Business Expansion',
-      status: 'active',
-      riskLevel: 'LOW',
-      appliedDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-      repaymentDate: new Date(Date.now() + 150 * 24 * 60 * 60 * 1000),
-      monthlyPayment: 4167,
-      remainingBalance: 20833,
-      interestRate: 10
-    },
-    {
-      id: 2,
-      amount: 10000,
-      purpose: 'Emergency',
-      status: 'repaid',
-      riskLevel: 'MEDIUM',
-      appliedDate: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
-      repaymentDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-      monthlyPayment: 1833,
-      remainingBalance: 0,
-      interestRate: 10
-    }
+    { id: '24', label: '24 months', multiplier: 1.35 },
+    { id: '36', label: '36 months', multiplier: 1.50 },
+    { id: '48', label: '48 months', multiplier: 1.65 }
   ];
 
   useEffect(() => {
-    // Mock data for demonstration
-    setLoans(mockLoans);
-    setTrustScore(85);
+    fetchUserData();
   }, []);
 
+  const fetchUserData = async () => {
+    try {
+      // Fetch user's trust score
+      const trustData = await transactionService.getTrustScore();
+      setTrustScore(trustData.trustScore || 0);
+
+      // Fetch user's loans
+      const loansData = await transactionService.getLoans();
+      setLoans(loansData || []);
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+      // Set empty state if API fails
+      setLoans([]);
+      setTrustScore(0);
+    }
+  };
+
   const assessRisk = async (loanAmount) => {
-    // Mock risk assessment
+    // Try to get real risk assessment from API
+    try {
+      const riskData = await transactionService.getLoanRisk(loanAmount);
+      setRiskAssessment(riskData);
+      return;
+    } catch (error) {
+      console.log('Using mock risk assessment');
+    }
+
+    // Mock risk assessment as fallback
     const score = trustScore;
     let riskLevel = 'LOW';
     let riskScore = 0;
@@ -142,25 +141,38 @@ const Loan = () => {
     setMessage(null);
     setError(null);
 
-    try {
-      // Simulate loan application
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const newLoan = {
-        id: loans.length + 1,
-        amount: Number(amount),
-        purpose: loanPurposes.find(p => p.id === loanPurpose)?.label || 'General',
-        status: 'pending',
-        riskLevel: riskAssessment.riskLevel,
-        appliedDate: new Date(),
-        repaymentDate: new Date(Date.now() + parseInt(repaymentPeriod) * 30 * 24 * 60 * 60 * 1000),
-        monthlyPayment: Math.ceil((Number(amount) * repaymentPeriods.find(p => p.id === repaymentPeriod)?.multiplier) / parseInt(repaymentPeriod)),
-        remainingBalance: Number(amount),
-        interestRate: riskAssessment.interestRate
-      };
+    // Validation
+    if (!amount || Number(amount) <= 0) {
+      setError('Please enter a valid loan amount');
+      setLoading(false);
+      return;
+    }
+    
+    if (!loanPurpose) {
+      setError('Please select a loan purpose to continue');
+      setLoading(false);
+      return;
+    }
+    
+    if (!repaymentPeriod) {
+      setError('Please select a repayment period');
+      setLoading(false);
+      return;
+    }
 
-      setLoans([newLoan, ...loans]);
-      setMessage(`Loan application submitted successfully! Application ID: #LOAN${String(newLoan.id).padStart(6, '0')}`);
+    try {
+      const response = await transactionService.applyLoan({
+        amount: Number(amount),
+        interestRate: riskAssessment?.interestRate || 12,
+        repaymentPeriod: parseInt(repaymentPeriod),
+        purpose: loanPurposes.find(p => p.id === loanPurpose)?.label || 'General'
+      });
+      
+      setMessage(`Loan application submitted successfully! Application ID: #LOAN${String(response.loan.id).padStart(6, '0')}`);
+      
+      // Refresh loans data
+      fetchUserData();
+      
       setAmount('');
       setLoanPurpose('');
       setRepaymentPeriod('6');
@@ -425,7 +437,9 @@ const Loan = () => {
               <form onSubmit={handleApply} className="space-y-6">
                 {/* Loan Purpose */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Loan Purpose</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Loan Purpose <span className="text-red-500">*</span>
+                  </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {loanPurposes.map((purpose) => (
                       <div key={purpose.id} className="relative">
@@ -440,7 +454,9 @@ const Loan = () => {
                         />
                         <label
                           htmlFor={purpose.id}
-                          className="block w-full p-4 border-2 rounded-lg cursor-pointer text-left transition-all duration-200 peer-checked:border-blue-600 peer-checked:bg-blue-50 hover:bg-gray-50"
+                          className={`block w-full p-4 border-2 rounded-lg cursor-pointer text-left transition-all duration-200 peer-checked:border-blue-600 peer-checked:bg-blue-50 hover:bg-gray-50 ${
+                            !loanPurpose && error?.includes('purpose') ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                          }`}
                         >
                           <div className="font-medium text-gray-900">{purpose.label}</div>
                           <div className="text-sm text-gray-500 mt-1">{purpose.description}</div>
@@ -448,6 +464,9 @@ const Loan = () => {
                       </div>
                     ))}
                   </div>
+                  {!loanPurpose && error?.includes('purpose') && (
+                    <p className="mt-2 text-sm text-red-600">Please select a loan purpose</p>
+                  )}
                 </div>
 
                 {/* Loan Amount */}
@@ -525,18 +544,18 @@ const Loan = () => {
                       </div>
                       <div className="text-center">
                         <div className="text-sm text-gray-500">Interest Rate</div>
-                        <div className="font-medium text-gray-900">{riskAssessment.interestRate}%</div>
+                        <div className="font-medium text-gray-900">{riskAssessment?.interestRate || 12}%</div>
                       </div>
                       <div className="text-center">
                         <div className="text-sm text-gray-500">Approval Chance</div>
-                        <div className="font-medium text-gray-900">{riskAssessment.approvalProbability}%</div>
+                        <div className="font-medium text-gray-900">{riskAssessment?.approvalProbability || 0}%</div>
                       </div>
                     </div>
 
                     {showRiskDetails && (
                       <div className="text-sm text-gray-600 space-y-2">
-                        <p>• {riskAssessment.recommendation}</p>
-                        <p>• Maximum eligible amount: {formatCurrency(riskAssessment.maxAmount)}</p>
+                        <p>• {riskAssessment?.recommendation || 'Risk assessment being calculated...'}</p>
+                        <p>• Maximum eligible amount: {formatCurrency(riskAssessment?.maxAmount || 0)}</p>
                         <p>• Total repayment: {formatCurrency(calculateTotalRepayment())}</p>
                         <p>• Monthly payment: {formatCurrency(Math.ceil(calculateTotalRepayment() / parseInt(repaymentPeriod)))}</p>
                       </div>
@@ -570,7 +589,7 @@ const Loan = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  disabled={loading || !amount || !loanPurpose}
+                  disabled={loading || !amount || !loanPurpose || !repaymentPeriod}
                   className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 >
                   {loading ? (
@@ -590,6 +609,26 @@ const Loan = () => {
                     </div>
                   )}
                 </button>
+                
+                {/* Helper text */}
+                {!amount || !loanPurpose || !repaymentPeriod ? (
+                  <div className="mt-3 text-sm text-gray-500 text-center">
+                    {!amount && !loanPurpose && !repaymentPeriod 
+                      ? 'Please enter an amount, select a loan purpose, and choose a repayment period to continue'
+                      : !amount && !loanPurpose
+                      ? 'Please enter an amount and select a loan purpose to continue'
+                      : !amount && !repaymentPeriod
+                      ? 'Please enter an amount and choose a repayment period to continue'
+                      : !loanPurpose && !repaymentPeriod
+                      ? 'Please select a loan purpose and choose a repayment period to continue'
+                      : !amount 
+                      ? 'Please enter a loan amount to continue'
+                      : !loanPurpose
+                      ? 'Please select a loan purpose to continue'
+                      : 'Please choose a repayment period to continue'
+                    }
+                  </div>
+                ) : null}
               </form>
             </div>
           </div>

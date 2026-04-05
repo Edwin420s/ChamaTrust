@@ -1,14 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import TrustScore from '../components/TrustScore';
 import TransactionList from '../components/TransactionList';
 import { useAuth } from '../hooks/useAuth';
+import { transactionService } from '../services/transactionService';
+import { formatCurrency } from '../utils/helpers';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [dashboardData, setDashboardData] = useState({
+    totalBalance: 0,
+    activeLoans: 0,
+    trustScore: 0,
+    monthlyGrowth: 0
+  });
+  const [loading, setLoading] = useState(true);
 
   // Navigation items for sidebar
   const navItems = [
@@ -35,6 +44,49 @@ const Dashboard = () => {
   };
 
   const canGoBack = location.pathname !== '/dashboard';
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        // Fetch real data from backend
+        const [trustData, loansData, transactionsData] = await Promise.all([
+          transactionService.getTrustScore(),
+          transactionService.getLoans(),
+          transactionService.getTransactions()
+        ]);
+
+        // Calculate dashboard metrics
+        const activeLoans = loansData.filter(loan => loan.status === 'approved' || loan.status === 'active').length;
+        const totalContributions = transactionsData
+          .filter(tx => tx.type === 'contribution' && tx.status === 'completed')
+          .reduce((sum, tx) => sum + tx.amount, 0);
+        const totalLoanDisbursements = transactionsData
+          .filter(tx => tx.type === 'loan_disbursement' && tx.status === 'completed')
+          .reduce((sum, tx) => sum + tx.amount, 0);
+        const totalBalance = totalContributions - totalLoanDisbursements;
+
+        setDashboardData({
+          totalBalance,
+          activeLoans,
+          trustScore: trustData.trustScore || 0,
+          monthlyGrowth: 0 // TODO: Calculate from historical data
+        });
+      } catch (error) {
+        console.error('Failed to fetch dashboard data:', error);
+        // Set default values on error
+        setDashboardData({
+          totalBalance: 0,
+          activeLoans: 0,
+          trustScore: 0,
+          monthlyGrowth: 0
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar Navigation */}
@@ -176,8 +228,10 @@ const Dashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total Balance</p>
-                  <p className="text-2xl font-bold text-gray-900">KES 45,000</p>
-                  <p className="text-sm text-green-600 mt-1">+12% this month</p>
+                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(dashboardData.totalBalance)}</p>
+                  <p className="text-sm text-green-600 mt-1">
+                    {dashboardData.monthlyGrowth > 0 ? '+' : ''}{dashboardData.monthlyGrowth}% this month
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                   <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,7 +245,7 @@ const Dashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Active Loans</p>
-                  <p className="text-2xl font-bold text-gray-900">2</p>
+                  <p className="text-2xl font-bold text-gray-900">{dashboardData.activeLoans}</p>
                   <p className="text-sm text-blue-600 mt-1">On track</p>
                 </div>
                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
@@ -206,8 +260,12 @@ const Dashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Trust Score</p>
-                  <p className="text-2xl font-bold text-gray-900">85/100</p>
-                  <p className="text-sm text-purple-600 mt-1">Excellent</p>
+                  <p className="text-2xl font-bold text-gray-900">{dashboardData.trustScore}/100</p>
+                  <p className="text-sm text-purple-600 mt-1">
+                    {dashboardData.trustScore >= 80 ? 'Excellent' : 
+                     dashboardData.trustScore >= 60 ? 'Good' : 
+                     dashboardData.trustScore >= 40 ? 'Fair' : 'Poor'}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
                   <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

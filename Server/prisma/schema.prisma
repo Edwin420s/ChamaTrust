@@ -15,7 +15,7 @@ model User {
   password         String?
   stellarPublicKey String?   @map("public_key")
   stellarSecretEncrypted String? @map("secret_key_encrypted")
-  trustScore       Float     @default(50.0)
+  trustScore       Float     @default(0.0)
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt
 

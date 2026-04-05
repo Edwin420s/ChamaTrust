@@ -4,11 +4,15 @@ const { calculateTrustScore } = require('../services/trustService');
 
 const applyForLoan = async (req, res) => {
   const userId = req.user.id;
-  const { amount, interestRate, repaymentDeadline, guarantorIds } = req.body;
+  const { amount, interestRate, repaymentPeriod, purpose } = req.body;
   
-  if (!amount || !repaymentDeadline) {
-    return res.status(400).json({ error: 'Amount and repayment deadline required' });
+  if (!amount || !repaymentPeriod) {
+    return res.status(400).json({ error: 'Amount and repayment period required' });
   }
+  
+  // Auto-generate dates
+  const appliedDate = new Date();
+  const repaymentDeadline = new Date(appliedDate.getTime() + (parseInt(repaymentPeriod) * 30 * 24 * 60 * 60 * 1000));
   
   const { riskScore, riskLevel, recommendation } = await assessLoanRisk(userId, amount);
   
@@ -17,11 +21,13 @@ const applyForLoan = async (req, res) => {
       userId,
       amount,
       interestRate: interestRate || 0,
-      repaymentDeadline: new Date(repaymentDeadline),
+      appliedDate,
+      repaymentDeadline,
       status: 'pending',
       riskScore,
       riskLevel,
-      guarantorIds: guarantorIds || []
+      guarantorIds: [],
+      purpose: purpose || 'General'
     }
   });
   

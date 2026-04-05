@@ -11,46 +11,7 @@ const TransactionList = () => {
     const fetchTransactions = async () => {
       try {
         const data = await transactionService.getTransactions();
-        // Mock data for demonstration
-        const mockTransactions = [
-          {
-            id: 1,
-            amount: 5000,
-            type: 'contribution',
-            status: 'completed',
-            timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-            description: 'Monthly contribution',
-            stellarTxHash: 'abc123def456'
-          },
-          {
-            id: 2,
-            amount: 2500,
-            type: 'loan_repayment',
-            status: 'completed',
-            timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
-            description: 'Loan repayment - March',
-            stellarTxHash: 'xyz789uvw456'
-          },
-          {
-            id: 3,
-            amount: 10000,
-            type: 'loan_disbursement',
-            status: 'completed',
-            timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-            description: 'Business loan approved',
-            stellarTxHash: 'def456ghi789'
-          },
-          {
-            id: 4,
-            amount: 500,
-            type: 'penalty',
-            status: 'pending',
-            timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), // 4 days ago
-            description: 'Late payment penalty',
-            stellarTxHash: null
-          }
-        ];
-        setTransactions(mockTransactions);
+        setTransactions(data || []);
       } catch (err) {
         console.error('Failed to fetch transactions:', err);
         setTransactions([]);

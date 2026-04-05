@@ -10,8 +10,8 @@ const getProfile = async (req, res) => {
 };
 
 const getTrustScoreController = async (req, res) => {
-  const score = await getTrustScore(req.user.id);
-  res.json({ trustScore: score });
+  const scoreData = await getTrustScore(req.user.id);
+  res.json(scoreData);
 };
 
 const updateProfile = async (req, res) => {

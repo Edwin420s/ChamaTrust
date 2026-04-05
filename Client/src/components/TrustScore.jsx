@@ -5,16 +5,18 @@ import { getTrustScoreInfo } from '../utils/helpers';
 const TrustScore = () => {
   const [score, setScore] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [scoreHistory, setScoreHistory] = useState([75, 78, 82, 85, 83, 85]);
+  const [scoreFactors, setScoreFactors] = useState([]);
 
   useEffect(() => {
     const fetchScore = async () => {
       try {
         const data = await transactionService.getTrustScore();
-        setScore(data.trustScore || 85);
+        setScore(data.trustScore || 0);
+        setScoreFactors(data.scoreFactors || []);
       } catch (err) {
         console.error('Failed to fetch trust score:', err);
-        setScore(85); // Fallback score
+        setScore(0);
+        setScoreFactors([]);
       } finally {
         setLoading(false);
       }
@@ -119,22 +121,20 @@ const TrustScore = () => {
         <div className="space-y-3">
           <h4 className="text-sm font-semibold text-gray-700">Score Factors</h4>
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Payment History</span>
-              <span className="text-green-600 font-medium">+40 pts</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Contributions</span>
-              <span className="text-green-600 font-medium">+30 pts</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Participation</span>
-              <span className="text-green-600 font-medium">+20 pts</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Penalties</span>
-              <span className="text-red-600 font-medium">-5 pts</span>
-            </div>
+            {scoreFactors.length > 0 ? (
+              scoreFactors.map((factor, index) => (
+                <div key={index} className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">{factor.name}</span>
+                  <span className={`font-medium ${factor.points > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {factor.points > 0 ? '+' : ''}{factor.points} pts
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="text-sm text-gray-500">
+                No score factors available yet. Start contributing to build your trust score.
+              </div>
+            )}
           </div>
         </div>
 

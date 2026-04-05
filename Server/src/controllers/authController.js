@@ -32,7 +32,7 @@ const mockGoogleLogin = async (req, res) => {
         name,
         stellarPublicKey: publicKey,
         stellarSecretEncrypted: encryptedSecret,
-        trustScore: 50.0
+        trustScore: 0
       }
     });
     
@@ -103,11 +103,10 @@ const register = async (req, res) => {
     const user = await prisma.user.create({
       data: {
         email,
-        name,
         password: hashedPassword,
         stellarPublicKey: publicKey,
         stellarSecretEncrypted: encryptedSecret,
-        trustScore: 50.0
+        trustScore: 0
       }
     });
     
