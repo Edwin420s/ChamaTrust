@@ -1,0 +1,341 @@
+# ===============================
+#  ChamaTrust .gitignore
+#  Full-stack + Blockchain
+# ===============================
+
+# -------------------------------
+#  Node.js / JavaScript
+# -------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.env.local
+.env.*.local
+
+# -------------------------------
+#  Environment & Secrets
+# -------------------------------
+.env
+.env.production
+.env.development
+.env.test
+*.pem
+*.key
+*.crt
+*.secret
+secrets/
+credentials.json
+
+# -------------------------------
+#  Backend (Node.js / Express)
+# -------------------------------
+backend/node_modules/
+backend/dist/
+backend/build/
+backend/.env
+backend/logs/
+backend/uploads/
+backend/temp/
+backend/*.log
+
+# -------------------------------
+#  Frontend (React / Vite)
+# -------------------------------
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.env
+frontend/.env.local
+frontend/.vite/
+frontend/*.log
+
+# -------------------------------
+#  Blockchain / Stellar / Soroban
+# -------------------------------
+blockchain/stellar/.stellar/
+blockchain/soroban-contracts/target/
+blockchain/soroban-contracts/**/target/
+blockchain/soroban-contracts/Cargo.lock
+blockchain/*.wasm
+blockchain/*.json
+stellar_keys.txt
+*.stellar_keypair
+
+# -------------------------------
+#  Database & Migrations
+# -------------------------------
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.pgdump
+pgdata/
+migrations/*.sql~  # backup SQL files
+scripts/*.secret.sql
+
+# -------------------------------
+#  Docker & Containers
+# -------------------------------
+docker/
+*.dockerignore
+*.tar
+*.tar.gz
+*.img
+.docker/
+docker-compose.override.yml
+
+# -------------------------------
+#  IDE / Editor Files
+# -------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.suo
+*.user
+*.sln
+*.csproj
+*.vscode/
+*.code-workspace
+
+# -------------------------------
+#  OS / System Files
+# -------------------------------
+Thumbs.db
+desktop.ini
+ehthumbs.db
+*.ds_store
+*.Spotlight-V100
+*.Trashes
+*.AppleDouble
+*.LSOverride
+
+# -------------------------------
+#  Logs & Temp Files
+# -------------------------------
+logs/
+*.log
+temp/
+tmp/
+*.tmp
+*.temp
+*.cache
+*.pid
+*.seed
+*.pid.lock
+
+# -------------------------------
+#  Build Artifacts
+# -------------------------------
+dist/
+build/
+out/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.jar
+*.war
+*.ear
+
+# -------------------------------
+#  Testing & Coverage
+# -------------------------------
+coverage/
+.nyc_output/
+*.test.js~
+*.test.ts~
+*.spec.js~
+*.spec.ts~
+jest.config.js
+vitest.config.js
+*.test-results/
+
+# -------------------------------
+#  Documentation (generated)
+# -------------------------------
+docs/_build/
+docs/api/*.html
+docs/*.pdf
+docs/*.epub
+
+# -------------------------------
+#  Stellar-specific ignores
+# -------------------------------
+*.stellar
+stellar-sdk.log
+horizon.log
+soroban-rpc.log
+friendbot_output.txt
+
+# -------------------------------
+#  Project-specific secrets
+# -------------------------------
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.truststore
+.htpasswd
+.htaccess
+.ssh/
+.aws/
+.gcloud/
+.azure/
+
+# -------------------------------
+#  Misc
+# -------------------------------
+*.bak
+*.old
+*.orig
+*.rej
+*.sql~
+.DS_Store
+.cache/
+.tern-port
+# Node.js / JavaScript
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+.pnpm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production
+.env.test
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.sql
+prisma/*.db
+prisma/*.db-journal
+prisma/migrations/*.sql
+!prisma/migrations/migration_lock.toml
+
+# Prisma generated client
+prisma/client/
+src/generated/
+
+# Stellar / blockchain
+blockchain/soroban-contracts/target/
+blockchain/soroban-contracts/**/target/
+blockchain/soroban-contracts/Cargo.lock
+*.wasm
+*.wat
+
+# Logs
+logs/
+*.log
+log/
+debug.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE / Editor
+.vscode/
+.idea/
+*.sublime-*
+.project
+.classpath
+.settings/
+*.iml
+
+# Build outputs
+dist/
+build/
+out/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.jar
+*.war
+*.ear
+
+# Docker
+docker/volumes/
+*.pid
+docker-compose.override.yml
+.dockerignore
+
+# Testing
+coverage/
+.nyc_output/
+*.test.js
+*.spec.js
+jest.config.js
+
+# Security / secrets
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.truststore
+*.secret
+*.env.encrypted
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+.cache/
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+
+# Stellar testnet / friendbot artifacts
+*.friendbot
+stellar_friendbot_cache.json
+
+# Prisma studio
+.prisma-studio.db
+
+# Sentry
+.sentrycli/
+sentry.properties
+
+# PM2
+.pm2/
+pm2-*.log
+
+# Redis
+dump.rdb
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
