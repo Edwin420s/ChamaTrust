@@ -14,8 +14,19 @@ const encrypt = (text) => {
     throw new Error('ENCRYPTION_KEY is required');
   }
 
+  const key = process.env.ENCRYPTION_KEY;
+  console.log('Encryption key length:', key.length);
+  console.log('Encryption key:', key);
+  
+  // Use a simple 32-byte key for AES-256
+  const keyBuffer = Buffer.from(key.substring(0, 32), 'utf8');
+  console.log('Key buffer length:', keyBuffer.length);
+  if (keyBuffer.length !== 32) {
+    throw new Error(`Invalid key length: ${keyBuffer.length}, expected 32`);
+  }
+  
   const iv = crypto.randomBytes(IV_LENGTH);
-  const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(process.env.ENCRYPTION_KEY, 'hex'), iv);
+  const cipher = crypto.createCipheriv(ALGORITHM, keyBuffer, iv);
   
   let encrypted = cipher.update(text, 'utf8', 'hex');
   encrypted += cipher.final('hex');
@@ -44,7 +55,7 @@ const decrypt = (encryptedData) => {
   const tag = Buffer.from(parts[1], 'hex');
   const encrypted = parts[2];
   
-  const decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(process.env.ENCRYPTION_KEY, 'hex'), iv);
+  const decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(process.env.ENCRYPTION_KEY.substring(0, 32), 'utf8'), iv);
   decipher.setAuthTag(tag);
   
   let decrypted = decipher.update(encrypted, 'hex', 'utf8');

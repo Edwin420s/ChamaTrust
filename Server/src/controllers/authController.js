@@ -78,22 +78,28 @@ const register = async (req, res) => {
   try {
     const { email, name, password } = req.body;
     
+    console.log('Registration request:', { email, name, hasPassword: !!password });
+    
     if (!email || !name || !password) {
+      console.log('Missing fields:', { email: !!email, name: !!name, password: !!password });
       return res.status(400).json({ error: 'All fields are required' });
     }
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     
     if (existingUser) {
+      console.log('User already exists:', email);
       return res.status(409).json({ error: 'User already exists' });
     }
 
+    console.log('Creating wallet...');
     const hashedPassword = await bcrypt.hash(password, 10);
     
     const { createWallet, encryptSecret } = require('../services/walletService');
     const { publicKey, secret } = createWallet();
     const encryptedSecret = encryptSecret(secret);
     
+    console.log('Creating user in database...');
     const user = await prisma.user.create({
       data: {
         email,
@@ -105,6 +111,8 @@ const register = async (req, res) => {
       }
     });
     
+    console.log('User created successfully:', user.id);
+    console.log('Funding wallet...');
     const { fundWallet } = require('../services/stellarService');
     await fundWallet(publicKey);
     
@@ -112,9 +120,11 @@ const register = async (req, res) => {
       expiresIn: process.env.JWT_EXPIRES_IN
     });
     
+    console.log('Registration successful');
     res.json({ token, user: { id: user.id, email: user.email, name: user.name, trustScore: user.trustScore } });
   } catch (error) {
-    res.status(500).json({ error: 'Registration failed' });
+    console.error('Registration error:', error);
+    res.status(500).json({ error: 'Registration failed', details: error.message });
   }
 };
 

@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: chamatrust
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./Server
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/chamatrust
+    volumes:
+      - ./Server:/app
+      - /app/node_modules
+
+  frontend:
+    build: ./Client
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./Client:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
