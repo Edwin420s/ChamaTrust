@@ -79,6 +79,66 @@ The system provides a **hybrid Web2/Web3 experience** where users enjoy familiar
 
 ## System Architecture
 
+```mermaid
+graph TB
+    subgraph User
+        A[Browser / User]
+    end
+
+    subgraph Frontend_React
+        B[Login Page<br/>Google OAuth]
+        C[Dashboard<br/>Trust Score Display]
+        D[Contribute Page<br/>Payment Form]
+        E[Loan Page<br/>Risk Indicator]
+        F[Dispute Page<br/>Evidence Upload]
+        G[API Service<br/>Axios / Fetch]
+    end
+
+    subgraph Backend_Node
+        H[API Gateway<br/>Express Routes]
+        I[Auth Middleware<br/>JWT Verification]
+        J[Wallet Manager<br/>Stellar Keypair]
+        K[Trust Engine<br/>Score Calculation]
+        L[Business Logic<br/>Contributions/Loans/Disputes]
+    end
+
+    subgraph Database_PostgreSQL
+        M[(Users Table)]
+        N[(Transactions Table)]
+        O[(Loans Table)]
+        P[(Disputes Table)]
+    end
+
+    subgraph Stellar_Blockchain
+        Q[Stellar Horizon API]
+        R[Soroban Smart Contracts<br/>LoanContract / PenaltyContract]
+        S[Stellar Network<br/>Testnet / Mainnet]
+    end
+
+    subgraph External
+        T[Google OAuth API]
+    end
+
+    A --> B & C & D & E & F
+    B --> G
+    C --> G
+    D --> G
+    E --> G
+    F --> G
+    G -->|HTTPS / JWT| H
+    H --> I --> J & K & L
+    J -->|Create wallet| Q
+    K -->|Update trust score| M
+    L -->|Record transaction| N
+    L -->|Loan risk| O
+    L -->|Dispute| P
+    L -->|Submit payment| Q
+    Q -->|Send tx| S
+    R -->|Deployed on| S
+    B -->|OAuth redirect| T
+    T -->|User data| H
+```
+
 The ChamaTrust system follows a hybrid Web2/Web3 architecture with clear separation of concerns:
 
 ### Core Components
