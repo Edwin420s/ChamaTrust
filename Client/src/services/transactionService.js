@@ -25,6 +25,14 @@ export const transactionService = {
     const response = await api.get('/loans/risk', { params: { amount } });
     return response.data;
   },
+  getPendingLoans: async () => {
+    const response = await api.get('/loans/pending');
+    return response.data;
+  },
+  approveLoan: async (loanId, action) => {
+    const response = await api.post(`/loans/${loanId}/approve`, { action });
+    return response.data;
+  },
   getTrustScore: async () => {
     const response = await api.get('/users/trust-score');
     return response.data;

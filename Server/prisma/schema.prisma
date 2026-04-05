@@ -46,11 +46,14 @@ model Loan {
   userId           Int       @map("user_id")
   amount           Float
   interestRate     Float     @default(0.0) @map("interest_rate")
+  appliedDate      DateTime  @default(now()) @map("applied_date")
   repaymentDeadline DateTime  @map("repayment_deadline")
-  status           String    @default("pending") // pending, approved, rejected, active, repaid, defaulted
+  status           String    @default("pending") // pending, approved, rejected, active, repaid, defaulted, funding_failed
   riskScore        Float?    @map("risk_score")
   riskLevel        String?   @map("risk_level") // LOW, MEDIUM, HIGH
   guarantorIds     Int[]     @map("guarantor_ids")
+  stellarTxHash    String?   @map("stellar_tx_hash")
+  purpose          String?
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt
 

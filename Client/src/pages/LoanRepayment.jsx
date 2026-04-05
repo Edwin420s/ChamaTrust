@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { formatCurrency, formatRelativeTime } from '../utils/helpers';
+import { transactionService } from '../services/transactionService';
 
 const LoanRepayment = () => {
   const { user } = useAuth();
@@ -40,64 +41,26 @@ const LoanRepayment = () => {
   };
 
   useEffect(() => {
-    // Mock active loans data
-    const mockActiveLoans = [
-      {
-        id: 1,
-        amount: 50000,
-        purpose: 'Business Expansion',
-        remainingBalance: 35000,
-        monthlyPayment: 2500,
-        nextDueDate: '15th April 2026',
-        interestRate: 12,
-        appliedDate: new Date('2026-01-15'),
-        status: 'active'
-      },
-      {
-        id: 2,
-        amount: 25000,
-        purpose: 'Emergency Fund',
-        remainingBalance: 18000,
-        monthlyPayment: 1500,
-        nextDueDate: '20th April 2026',
-        interestRate: 15,
-        appliedDate: new Date('2026-02-01'),
-        status: 'active'
+    const fetchLoanData = async () => {
+      try {
+        // Fetch user's loans
+        const loansData = await transactionService.getLoans();
+        const activeLoans = loansData.filter(loan => loan.status === 'active' || loan.status === 'approved');
+        
+        // Fetch transactions for repayment history
+        const transactions = await transactionService.getTransactions();
+        const repayments = transactions.filter(tx => tx.type === 'loan_repayment');
+        
+        setActiveLoans(activeLoans);
+        setRepaymentHistory(repayments);
+      } catch (error) {
+        console.error('Failed to fetch loan data:', error);
+        setActiveLoans([]);
+        setRepaymentHistory([]);
       }
-    ];
+    };
 
-    const mockRepaymentHistory = [
-      {
-        id: 1,
-        loanId: 1,
-        amount: 2500,
-        date: new Date('2026-03-15'),
-        status: 'completed',
-        method: 'Stellar',
-        transactionHash: 'abc123...def456'
-      },
-      {
-        id: 2,
-        loanId: 1,
-        amount: 2500,
-        date: new Date('2026-02-15'),
-        status: 'completed',
-        method: 'Stellar',
-        transactionHash: 'xyz789...uvw456'
-      },
-      {
-        id: 3,
-        loanId: 2,
-        amount: 1500,
-        date: new Date('2026-03-20'),
-        status: 'completed',
-        method: 'Stellar',
-        transactionHash: 'def456...ghi789'
-      }
-    ];
-
-    setActiveLoans(mockActiveLoans);
-    setRepaymentHistory(mockRepaymentHistory);
+    fetchLoanData();
   }, []);
 
   const handleRepayment = async (loanId) => {
@@ -230,7 +193,7 @@ const LoanRepayment = () => {
                 </div>
                 <div className="flex-1 min-w-0 text-left">
                   <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
-                  <p className="text-xs text-gray-500">Trust Score: {user.trustScore || 75}</p>
+                  <p className="text-xs text-gray-500">Trust Score: {user.trustScore || 0}</p>
                 </div>
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -314,7 +277,9 @@ const LoanRepayment = () => {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-500">Next Payment Due</p>
-                  <p className="text-xl font-semibold text-gray-900">15th April</p>
+                  <p className="text-xl font-semibold text-gray-900">
+                    {activeLoans.length > 0 ? 'Calculate based on loan terms' : 'No active loans'}
+                  </p>
                 </div>
               </div>
             </div>

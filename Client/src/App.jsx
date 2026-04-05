@@ -9,6 +9,7 @@ import Loan from './pages/Loan';
 import LoanRepayment from './pages/LoanRepayment';
 import Disputes from './pages/Disputes';
 import Profile from './pages/Profile';
+import Admin from './pages/Admin';
 import Landing from './pages/Landing';
 import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
@@ -28,6 +29,7 @@ function App() {
             <Route path="/repayment" element={<PrivateRoute><LoanRepayment /></PrivateRoute>} />
             <Route path="/disputes" element={<PrivateRoute><Disputes /></PrivateRoute>} />
             <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+            <Route path="/admin" element={<PrivateRoute><Admin /></PrivateRoute>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>

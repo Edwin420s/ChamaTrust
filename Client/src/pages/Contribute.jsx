@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { transactionService } from '../services/transactionService';
 import { useAuth } from '../hooks/useAuth';
-import { formatCurrency } from '../utils/helpers';
+import { formatCurrency, formatRelativeTime } from '../utils/helpers';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const Contribute = () => {
@@ -17,11 +17,18 @@ const Contribute = () => {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [senderSecret, setSenderSecret] = useState('');
   const [receiverPublic, setReceiverPublic] = useState('');
+  const [contributionStats, setContributionStats] = useState({
+    totalContributed: 0,
+    thisMonth: 0,
+    rank: 'N/A'
+  });
+  const [recentContributions, setRecentContributions] = useState([]);
 
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z' },
     { path: '/contribute', label: 'Contribute', icon: 'M12 6v6m0 0v6m0-6h6m-6 0H6' },
     { path: '/loan', label: 'Loans', icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z' },
+    { path: '/repayment', label: 'Repayment', icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z' },
     { path: '/disputes', label: 'Disputes', icon: 'M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
     { path: '/profile', label: 'Profile', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
   ];
@@ -40,6 +47,41 @@ const Contribute = () => {
     logout();
     navigate('/');
   };
+
+  useEffect(() => {
+    const fetchContributionStats = async () => {
+      try {
+        const transactions = await transactionService.getTransactions();
+        const contributions = transactions.filter(tx => tx.type === 'contribution' && tx.status === 'completed');
+        
+        const totalContributed = contributions.reduce((sum, tx) => sum + tx.amount, 0);
+        
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+        const thisMonthContributions = contributions.filter(tx => {
+          const txDate = new Date(tx.timestamp);
+          return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
+        });
+        const thisMonth = thisMonthContributions.reduce((sum, tx) => sum + tx.amount, 0);
+        
+        // Get recent contributions (last 5)
+        const recent = contributions
+          .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+          .slice(0, 5);
+        
+        setContributionStats({
+          totalContributed,
+          thisMonth,
+          rank: 'N/A' // TODO: Calculate actual rank from all users
+        });
+        setRecentContributions(recent);
+      } catch (error) {
+        console.error('Failed to fetch contribution stats:', error);
+      }
+    };
+
+    fetchContributionStats();
+  }, []);
 
   const predefinedAmounts = [1000, 2500, 5000, 10000, 25000];
   const contributionTypes = [
@@ -154,7 +196,7 @@ const Contribute = () => {
                 </div>
                 <div className="flex-1 min-w-0 text-left">
                   <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
-                  <p className="text-xs text-gray-500">Trust Score: {user.trustScore || 75}</p>
+                  <p className="text-xs text-gray-500">Trust Score: {user.trustScore || 0}</p>
                 </div>
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -222,7 +264,7 @@ const Contribute = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">Total Contributed</p>
-              <p className="text-xl font-semibold text-gray-900">{formatCurrency(45000)}</p>
+              <p className="text-xl font-semibold text-gray-900">{formatCurrency(contributionStats.totalContributed)}</p>
             </div>
           </div>
         </div>
@@ -236,7 +278,7 @@ const Contribute = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">This Month</p>
-              <p className="text-xl font-semibold text-gray-900">{formatCurrency(5000)}</p>
+              <p className="text-xl font-semibold text-gray-900">{formatCurrency(contributionStats.thisMonth)}</p>
             </div>
           </div>
         </div>
@@ -250,7 +292,7 @@ const Contribute = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">Rank</p>
-              <p className="text-xl font-semibold text-gray-900">#3 of 25</p>
+              <p className="text-xl font-semibold text-gray-900">{contributionStats.rank}</p>
             </div>
           </div>
         </div>
@@ -457,27 +499,22 @@ const Contribute = () => {
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Contributions</h3>
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Monthly Contribution</p>
-                  <p className="text-xs text-gray-500">2 days ago</p>
+              {recentContributions.length > 0 ? (
+                recentContributions.map((contribution, index) => (
+                  <div key={index} className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{contribution.description || 'Contribution'}</p>
+                      <p className="text-xs text-gray-500">{formatRelativeTime(contribution.timestamp)}</p>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">{formatCurrency(contribution.amount)}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-4">
+                  <p className="text-sm text-gray-500">No contributions yet</p>
+                  <p className="text-xs text-gray-400">Your contribution history will appear here</p>
                 </div>
-                <span className="text-sm font-medium text-gray-900">{formatCurrency(5000)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Emergency Fund</p>
-                  <p className="text-xs text-gray-500">1 week ago</p>
-                </div>
-                <span className="text-sm font-medium text-gray-900">{formatCurrency(2000)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Investment Pool</p>
-                  <p className="text-xs text-gray-500">2 weeks ago</p>
-                </div>
-                <span className="text-sm font-medium text-gray-900">{formatCurrency(10000)}</span>
-              </div>
+              )}
             </div>
           </div>
 
