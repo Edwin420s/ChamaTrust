@@ -31,6 +31,17 @@ const Disputes = () => {
     navigate(-1);
   };
 
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  const handleUserClick = () => {
+    setShowUserMenu(!showUserMenu);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   const disputeTypes = [
     { id: 'payment', label: 'Payment Issue', description: 'Disputes related to payments or transactions' },
     { id: 'loan', label: 'Loan Disagreement', description: 'Issues with loan terms or repayments' },
@@ -249,16 +260,38 @@ const Disputes = () => {
         {/* User Info Footer */}
         {sidebarOpen && user && (
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-sm font-bold text-blue-600">
-                  {user.name.charAt(0).toUpperCase()}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
-                <p className="text-xs text-gray-500">Trust Score: {user.trustScore || 75}</p>
-              </div>
+            <div className="relative">
+              <button
+                onClick={handleUserClick}
+                className="flex items-center space-x-3 w-full hover:bg-gray-50 rounded-lg p-2 transition-colors"
+              >
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-sm font-bold text-blue-600">
+                    {user.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
+                  <p className="text-xs text-gray-500">Trust Score: {user.trustScore || 75}</p>
+                </div>
+                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {showUserMenu && (
+                <div className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-20">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center space-x-2 px-4 py-3 hover:bg-red-50 transition-colors text-left"
+                  >
+                    <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span className="text-sm text-red-600 font-medium">Logout</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}

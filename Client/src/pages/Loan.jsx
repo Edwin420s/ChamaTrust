@@ -5,7 +5,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 const Loan = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -19,6 +19,8 @@ const Loan = () => {
   const [trustScore, setTrustScore] = useState(85);
   const [riskAssessment, setRiskAssessment] = useState(null);
   const [showRiskDetails, setShowRiskDetails] = useState(false);
+  const [activeTab, setActiveTab] = useState(location.search.includes('tab=repayment') ? 'repayment' : 'application');
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z' },
@@ -30,6 +32,15 @@ const Loan = () => {
 
   const handleBack = () => {
     navigate(-1);
+  };
+
+  const handleUserClick = () => {
+    setShowUserMenu(!showUserMenu);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   const loanPurposes = [
@@ -246,16 +257,38 @@ const Loan = () => {
         {/* User Info Footer */}
         {sidebarOpen && user && (
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-sm font-bold text-blue-600">
-                  {user.name.charAt(0).toUpperCase()}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
-                <p className="text-xs text-gray-500">Trust Score: {user.trustScore || 75}</p>
-              </div>
+            <div className="relative">
+              <button
+                onClick={handleUserClick}
+                className="flex items-center space-x-3 w-full hover:bg-gray-50 rounded-lg p-2 transition-colors"
+              >
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-sm font-bold text-blue-600">
+                    {user.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
+                  <p className="text-xs text-gray-500">Trust Score: {user.trustScore || 75}</p>
+                </div>
+                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {showUserMenu && (
+                <div className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-20">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center space-x-2 px-4 py-3 hover:bg-red-50 transition-colors text-left"
+                  >
+                    <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span className="text-sm text-red-600 font-medium">Logout</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -291,6 +324,32 @@ const Loan = () => {
       <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Loan Management</h1>
         <p className="text-gray-600">Access quick loans based on your trust score and community reputation</p>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1">
+        <div className="flex space-x-1">
+          <button
+            onClick={() => setActiveTab('application')}
+            className={`flex-1 px-4 py-2 rounded-md font-medium text-sm transition-colors ${
+              activeTab === 'application'
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            }`}
+          >
+            Apply for Loan
+          </button>
+          <button
+            onClick={() => setActiveTab('repayment')}
+            className={`flex-1 px-4 py-2 rounded-md font-medium text-sm transition-colors ${
+              activeTab === 'repayment'
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            }`}
+          >
+            Loan Repayment
+          </button>
+        </div>
       </div>
 
       {/* Loan Stats */}
@@ -354,6 +413,7 @@ const Loan = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
         {/* Loan Application Form */}
+        {activeTab === 'application' && (
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             {/* Form Header */}
@@ -534,88 +594,195 @@ const Loan = () => {
             </div>
           </div>
         </div>
+        )}
 
         {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Loan Calculator */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Loan Calculator</h3>
-            {amount ? (
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Principal Amount</span>
-                  <span className="font-medium">{formatCurrency(amount)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Interest Rate</span>
-                  <span className="font-medium">{riskAssessment?.interestRate || 12}%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Repayment Period</span>
-                  <span className="font-medium">{repaymentPeriods.find(p => p.id === repaymentPeriod)?.label}</span>
-                </div>
-                <div className="pt-3 border-t border-gray-200">
+        {activeTab === 'application' && (
+          <div className="space-y-6">
+            {/* Loan Calculator */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Loan Calculator</h3>
+              {amount ? (
+                <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-sm font-medium text-gray-900">Total Repayment</span>
-                    <span className="font-bold text-lg text-blue-600">{formatCurrency(calculateTotalRepayment())}</span>
+                    <span className="text-sm text-gray-600">Principal Amount</span>
+                    <span className="font-medium">{formatCurrency(amount)}</span>
                   </div>
-                  <div className="flex justify-between mt-2">
-                    <span className="text-sm text-gray-600">Monthly Payment</span>
-                    <span className="font-medium">{formatCurrency(Math.ceil(calculateTotalRepayment() / parseInt(repaymentPeriod)))}</span>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Interest Rate</span>
+                    <span className="font-medium">{riskAssessment?.interestRate || 12}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Repayment Period</span>
+                    <span className="font-medium">{repaymentPeriods.find(p => p.id === repaymentPeriod)?.label}</span>
+                  </div>
+                  <div className="pt-3 border-t border-gray-200">
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-900">Total Repayment</span>
+                      <span className="font-bold text-lg text-blue-600">{formatCurrency(calculateTotalRepayment())}</span>
+                    </div>
+                    <div className="flex justify-between mt-2">
+                      <span className="text-sm text-gray-600">Monthly Payment</span>
+                      <span className="font-medium">{formatCurrency(Math.ceil(calculateTotalRepayment() / parseInt(repaymentPeriod)))}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500">Enter an amount to see calculations</p>
-            )}
-          </div>
+              ) : (
+                <p className="text-sm text-gray-500">Enter an amount to see calculations</p>
+              )}
+            </div>
 
           {/* Your Loans */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Loans</h3>
-            {loans.length === 0 ? (
-              <p className="text-sm text-gray-500">No loans yet. Apply for your first loan!</p>
-            ) : (
-              <div className="space-y-3">
-                {loans.slice(0, 3).map((loan) => (
-                  <div key={loan.id} className="border border-gray-200 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-gray-900">{formatCurrency(loan.amount)}</span>
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(loan.status)}`}>
-                        {loan.status}
-                      </span>
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Loans</h3>
+              {loans.length === 0 ? (
+                <p className="text-sm text-gray-500">No loans yet. Apply for your first loan!</p>
+              ) : (
+                <div className="space-y-3">
+                  {loans.slice(0, 3).map((loan) => (
+                    <div key={loan.id} className="border border-gray-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">{formatCurrency(loan.amount)}</span>
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(loan.status)}`}>
+                          {loan.status}
+                        </span>
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        <div>{loan.purpose}</div>
+                        <div>Applied {formatRelativeTime(loan.appliedDate)}</div>
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-500">
-                      <div>{loan.purpose}</div>
-                      <div>Applied {formatRelativeTime(loan.appliedDate)}</div>
+                  ))}
+                  {loans.length > 3 && (
+                    <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                      View all loans
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Help Section */}
+            <div className="bg-blue-50 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-blue-900 mb-3">Loan Guidelines</h3>
+              <ul className="text-sm text-blue-800 space-y-2">
+                <li>• Loans are based on your trust score</li>
+                <li>• Higher scores = better rates & limits</li>
+                <li>• Repayments are automatic</li>
+                <li>• No collateral required for low-risk loans</li>
+              </ul>
+              <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors duration-200 mt-4">
+                Learn More
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Loan Repayment Section */}
+        {activeTab === 'repayment' && (
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              {/* Repayment Header */}
+              <div className="bg-gradient-to-r from-orange-600 to-red-600 px-6 py-4">
+                <h2 className="text-xl font-semibold text-white">Loan Repayment</h2>
+              </div>
+
+              <div className="p-6">
+                {/* Active Loans for Repayment */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Select Loan to Repay</h3>
+                
+                  {loans.filter(loan => loan.status === 'active').length === 0 ? (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                      </div>
+                      <p className="text-gray-500">No active loans to repay</p>
+                      <button 
+                        onClick={() => setActiveTab('application')}
+                        className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
+                      >
+                        Apply for a loan
+                      </button>
+                    </div>
+                  ) : (
+                    loans.filter(loan => loan.status === 'active').map((loan) => (
+                      <div key={loan.id} className="border border-gray-200 rounded-lg p-4 hover:border-orange-300 transition-colors">
+                        <div className="flex items-center justify-between mb-3">
+                          <div>
+                            <h4 className="font-medium text-gray-900">{formatCurrency(loan.amount)}</h4>
+                            <p className="text-sm text-gray-500">{loan.purpose}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm text-gray-500">Remaining</p>
+                            <p className="font-semibold text-orange-600">{formatCurrency(loan.remainingBalance)}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4 mb-3">
+                          <div>
+                            <p className="text-xs text-gray-500">Monthly Payment</p>
+                            <p className="font-medium">{formatCurrency(loan.monthlyPayment)}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">Next Due</p>
+                            <p className="font-medium">{loan.nextDueDate || '15th of month'}</p>
+                          </div>
+                        </div>
+                        
+                        <button className="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors font-medium">
+                          Make Repayment
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Repayment History */}
+                <div className="mt-8 pt-8 border-t border-gray-200">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Repayments</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                      <div>
+                        <p className="font-medium text-gray-900">Monthly Repayment</p>
+                        <p className="text-sm text-gray-500">March 2026</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-green-600">-KES 2,500</p>
+                        <p className="text-xs text-gray-500">Completed</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                      <div>
+                        <p className="font-medium text-gray-900">Monthly Repayment</p>
+                        <p className="text-sm text-gray-500">February 2026</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-green-600">-KES 2,500</p>
+                        <p className="text-xs text-gray-500">Completed</p>
+                      </div>
                     </div>
                   </div>
-                ))}
-                {loans.length > 3 && (
-                  <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                    View all loans
-                  </button>
-                )}
+                </div>
               </div>
-            )}
-          </div>
+            </div>
 
-          {/* Help Section */}
-          <div className="bg-blue-50 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-blue-900 mb-3">Loan Guidelines</h3>
-            <ul className="text-sm text-blue-800 space-y-2">
-              <li>• Loans are based on your trust score</li>
-              <li>• Higher scores = better rates & limits</li>
-              <li>• Repayments are automatic</li>
-              <li>• No collateral required for low-risk loans</li>
-            </ul>
-            <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors duration-200 mt-4">
-              Learn More
-            </button>
+            {/* Repayment Tips */}
+            <div className="bg-orange-50 rounded-xl p-6 mt-6">
+              <h3 className="text-lg font-semibold text-orange-900 mb-3">Repayment Tips</h3>
+              <ul className="text-sm text-orange-800 space-y-2">
+                <li>• On-time repayments improve your trust score</li>
+                <li>• Early repayments may reduce interest</li>
+                <li>• Set up automatic payments for convenience</li>
+                <li>• Contact support if you need a payment extension</li>
+              </ul>
+            </div>
           </div>
-        </div>
+        )}
       </div>
-        </div>
+      </div>
       </main>
     </div>
   );

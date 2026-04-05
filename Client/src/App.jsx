@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Contribute from './pages/Contribute';
 import Loan from './pages/Loan';
+import LoanRepayment from './pages/LoanRepayment';
 import Disputes from './pages/Disputes';
 import Profile from './pages/Profile';
 import Landing from './pages/Landing';
@@ -24,6 +25,7 @@ function App() {
             <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
             <Route path="/contribute" element={<PrivateRoute><Contribute /></PrivateRoute>} />
             <Route path="/loan" element={<PrivateRoute><Loan /></PrivateRoute>} />
+            <Route path="/repayment" element={<PrivateRoute><LoanRepayment /></PrivateRoute>} />
             <Route path="/disputes" element={<PrivateRoute><Disputes /></PrivateRoute>} />
             <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
             <Route path="*" element={<Navigate to="/" replace />} />
